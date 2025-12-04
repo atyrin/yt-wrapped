@@ -1,0 +1,23 @@
+{
+  "name": "youtrack-wrapped",
+  "version": "2.0.0",
+  "description": "Year in Review for YouTrack - a Spotify Wrapped-style statistics page (Serverless)",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve src/public -l 3000",
+    "start": "npx serve src/public -l 3000",
+    "serve": "npx serve src/public -l 3000"
+  },
+  "keywords": [
+    "youtrack",
+    "wrapped",
+    "year-in-review",
+    "statistics",
+    "serverless"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

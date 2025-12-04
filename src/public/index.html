@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTrack Wrapped</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Login Screen -->
+    <div class="login-screen" id="login-screen">
+      <div class="login-content">
+        <div class="login-header">
+          <div class="logo-animation">
+            <div class="logo-circle"></div>
+            <div class="logo-ring"></div>
+          </div>
+          <h1>YouTrack Wrapped</h1>
+          <p>Your Year in Review</p>
+        </div>
+
+        <form id="login-form" class="login-form">
+          <div class="form-group">
+            <label for="youtrack-url">YouTrack URL</label>
+            <input
+              type="url"
+              id="youtrack-url"
+              placeholder="https://youtrack.example.com"
+              required
+            >
+            <small class="form-hint">Your YouTrack instance URL</small>
+          </div>
+
+          <div class="form-group">
+            <label for="youtrack-token">API Token</label>
+            <input
+              type="password"
+              id="youtrack-token"
+              placeholder="perm:xxxxx..."
+              required
+            >
+            <small class="form-hint">
+              Get your token from YouTrack Profile → Authentication → New token
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="year">Year</label>
+            <input
+              type="number"
+              id="year"
+              min="2000"
+              max="2099"
+              required
+            >
+            <small class="form-hint">The year to generate statistics for</small>
+          </div>
+
+          <div class="form-group">
+            <label for="article-projects">Article Projects (Optional)</label>
+            <input
+              type="text"
+              id="article-projects"
+              placeholder="KT, KQA, KED"
+            >
+            <small class="form-hint">
+              Comma-separated project short names to fetch articles from
+            </small>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remember-credentials">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">Remember my credentials</span>
+            </label>
+            <small class="form-hint security-hint">
+              Credentials will be stored in your browser's local storage
+            </small>
+          </div>
+
+          <div class="login-error" id="login-error" style="display: none;"></div>
+
+          <button type="submit" class="login-button">
+            Generate My Wrapped
+          </button>
+        </form>
+
+        <div class="login-footer">
+          <p class="security-note">
+            Your credentials are processed entirely in your browser.
+            Nothing is sent to any server except your YouTrack instance.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading" style="display: none;">
+      <div class="loading-content">
+        <div class="logo-animation">
+          <div class="logo-circle"></div>
+          <div class="logo-ring"></div>
+        </div>
+        <h1>YouTrack Wrapped</h1>
+        <p id="loading-text">Gathering your year in review...</p>
+        <div class="loading-bar">
+          <div class="loading-progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wrapped Content -->
+    <div class="wrapped-container" id="wrapped" style="display: none;">
+      <!-- Hero Section -->
+      <section class="slide hero-slide" id="hero">
+        <div class="hero-content">
+          <div class="hero-badge">Year in Review</div>
+          <h1 class="hero-title">
+            <span class="year-text" id="year-text">2025</span>
+            <span class="wrapped-text">Wrapped</span>
+          </h1>
+          <div class="user-info">
+            <img class="user-avatar" id="user-avatar" src="" alt="Avatar">
+            <span class="user-name" id="user-name">Loading...</span>
+          </div>
+          <div class="scroll-indicator">
+            <span>Scroll to explore</span>
+            <div class="scroll-arrow"></div>
+          </div>
+        </div>
+        <div class="hero-bg-shapes">
+          <div class="shape shape-1"></div>
+          <div class="shape shape-2"></div>
+          <div class="shape shape-3"></div>
+        </div>
+      </section>
+
+      <!-- Summary Section -->
+      <section class="slide summary-slide" id="summary">
+        <div class="slide-content">
+          <h2 class="slide-title">Your Year at a Glance</h2>
+          <div class="stats-grid">
+            <div class="stat-card" data-stat="issues-created">
+              <div class="stat-icon">📝</div>
+              <div class="stat-number" id="stat-issues-created">0</div>
+              <div class="stat-label">Issues Created</div>
+            </div>
+            <div class="stat-card" data-stat="issues-resolved">
+              <div class="stat-icon">✅</div>
+              <div class="stat-number" id="stat-issues-resolved">0</div>
+              <div class="stat-label">Issues Resolved</div>
+            </div>
+            <div class="stat-card" data-stat="comments">
+              <div class="stat-icon">💬</div>
+              <div class="stat-number" id="stat-comments">0</div>
+              <div class="stat-label">Comments Left</div>
+            </div>
+            <div class="stat-card" data-stat="articles">
+              <div class="stat-icon">📚</div>
+              <div class="stat-number" id="stat-articles">0</div>
+              <div class="stat-label">Articles Written</div>
+            </div>
+          </div>
+          <div class="total-contributions">
+            <span class="total-number" id="total-contributions">0</span>
+            <span class="total-label">Total Contributions</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Top Project Section -->
+      <section class="slide project-slide" id="top-project">
+        <div class="slide-content">
+          <h2 class="slide-title">Your Top Project</h2>
+          <div class="top-project-card">
+            <div class="project-badge" id="project-badge">PRJ</div>
+            <h3 class="project-name" id="project-name">Project Name</h3>
+            <div class="project-stats">
+              <div class="project-stat">
+                <span class="project-stat-number" id="project-issues">0</span>
+                <span class="project-stat-label">Issues</span>
+              </div>
+              <div class="project-stat">
+                <span class="project-stat-number" id="project-resolved">0</span>
+                <span class="project-stat-label">Resolved</span>
+              </div>
+              <div class="project-stat">
+                <span class="project-stat-number" id="project-comments">0</span>
+                <span class="project-stat-label">Comments</span>
+              </div>
+            </div>
+          </div>
+          <div class="all-projects">
+            <h4>All Projects</h4>
+            <div class="projects-list" id="projects-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Time Stats Section -->
+      <section class="slide time-slide" id="time-stats">
+        <div class="slide-content">
+          <h2 class="slide-title">When You're Most Active</h2>
+          <div class="time-insights">
+            <div class="time-card busiest-month">
+              <div class="time-icon">📅</div>
+              <div class="time-value" id="busiest-month">January</div>
+              <div class="time-label">Busiest Month</div>
+              <div class="time-count" id="busiest-month-count">0 activities</div>
+            </div>
+            <div class="time-card busiest-day">
+              <div class="time-icon">📆</div>
+              <div class="time-value" id="busiest-day">Monday</div>
+              <div class="time-label">Power Day</div>
+              <div class="time-count" id="busiest-day-count">0 activities</div>
+            </div>
+            <div class="time-card busiest-hour">
+              <div class="time-icon">⏰</div>
+              <div class="time-value" id="busiest-hour">10:00</div>
+              <div class="time-label">Peak Hour</div>
+              <div class="time-count" id="busiest-hour-count">0 activities</div>
+            </div>
+          </div>
+          <div class="activity-chart">
+            <h4>Monthly Activity</h4>
+            <div class="chart-bars" id="monthly-chart"></div>
+            <div class="chart-labels">
+              <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span>
+              <span>May</span><span>Jun</span><span>Jul</span><span>Aug</span>
+              <span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Streak Section -->
+      <section class="slide streak-slide" id="streak">
+        <div class="slide-content">
+          <h2 class="slide-title">Your Longest Streak</h2>
+          <div class="streak-display">
+            <div class="streak-flames">🔥</div>
+            <div class="streak-number" id="streak-days">0</div>
+            <div class="streak-label">Consecutive Days</div>
+          </div>
+          <div class="streak-dates" id="streak-dates">
+            <span class="streak-start"></span>
+            <span class="streak-arrow">→</span>
+            <span class="streak-end"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Fun Facts Section -->
+      <section class="slide facts-slide" id="fun-facts">
+        <div class="slide-content">
+          <h2 class="slide-title">Fun Facts</h2>
+          <div class="facts-list" id="facts-list"></div>
+        </div>
+      </section>
+
+      <!-- Achievements Section -->
+      <section class="slide achievements-slide" id="achievements">
+        <div class="slide-content">
+          <h2 class="slide-title">Your Achievements</h2>
+          <div class="achievements-grid" id="achievements-grid"></div>
+        </div>
+      </section>
+
+      <!-- Final Section -->
+      <section class="slide final-slide" id="final">
+        <div class="slide-content">
+          <h2 class="final-title">That's a Wrap!</h2>
+          <p class="final-subtitle">Here's to an even more productive <span id="next-year">2025</span></p>
+          <div class="share-section">
+            <button class="share-button" id="share-button">
+              Share Your Wrapped
+            </button>
+          </div>
+          <div class="footer-credits">
+            <p>YouTrack Wrapped</p>
+            <p class="powered-by">Your Year in Issues, Comments & Articles</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Error Screen -->
+    <div class="error-screen" id="error" style="display: none;">
+      <div class="error-content">
+        <div class="error-icon">⚠️</div>
+        <h2>Oops! Something went wrong</h2>
+        <p id="error-message">Unable to load your YouTrack Wrapped data.</p>
+        <button class="retry-button" onclick="location.reload()">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
